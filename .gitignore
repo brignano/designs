@@ -1,0 +1,3 @@
+# Ignore macOS draw.io draft/temporary files
+.$*.drawio
+.$*.drawio.*
