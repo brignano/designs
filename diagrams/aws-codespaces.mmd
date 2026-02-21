@@ -4,7 +4,7 @@ flowchart LR
     APIGW --> LambdaStart[app-5284-codespaces-start-task-dev\nLambda]
     LambdaStart --> ECSDev[app-5284-codespaces-cluster-dev\nECS]
     Workstation[VS Code Workstation] -- SSH Tunnel --> ECSDev
-    LambdaStart -. git clone {repo} .-> GHDev[{GitHub Repo\n{repo}}]
+    LambdaStart -. "git clone <repo>" .-> GHDev["GitHub Repo<br/>repo"]
   end
 
   subgraph Prod[DevOpsSDFProd]
@@ -13,5 +13,5 @@ flowchart LR
     LambdaRun --> ECSProd[app-5284-codespaces-prod\nECS]
     ECSProd --> RDS[app-5284-codespaces-database\nRDS]
     EventBridge[EventBridge] -- hourly --> ECSProd
-    LambdaRun -. git clone {repo} .-> GHProd[{GitHub Repo\n{repo}}]
+    LambdaRun -. "git clone <repo>" .-> GHProd["GitHub Repo<br/>repo"]
   end
