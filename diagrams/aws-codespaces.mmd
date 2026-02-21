@@ -1,0 +1,17 @@
+flowchart LR
+  subgraph Sandbox[DevOpsSDFSandbox]
+    DevOps[DevOps] --> APIGW[codespaces.thehartford.com/api/v1/start\nAPI Gateway]
+    APIGW --> LambdaStart[app-5284-codespaces-start-task-dev\nLambda]
+    LambdaStart --> ECSDev[app-5284-codespaces-cluster-dev\nECS]
+    Workstation[VS Code Workstation] -- SSH Tunnel --> ECSDev
+    LambdaStart -. "git clone <repo>" .-> GHDev["GitHub Repo<br/>repo"]
+  end
+
+  subgraph Prod[DevOpsSDFProd]
+    Developer[Developer] --> Route53[codespaces.thehartford.com\nRoute 53]
+    Route53 --> LambdaRun[app-5284-codespaces-ecs-run-task\nLambda]
+    LambdaRun --> ECSProd[app-5284-codespaces-prod\nECS]
+    ECSProd --> RDS[app-5284-codespaces-database\nRDS]
+    EventBridge[EventBridge] -- hourly --> ECSProd
+    LambdaRun -. "git clone <repo>" .-> GHProd["GitHub Repo<br/>repo"]
+  end

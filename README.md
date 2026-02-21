@@ -1,32 +1,40 @@
 # designs
 
-This repository is a personal collection of diagrams created with [draw.io](https://www.drawio.com/). It serves as a central place to store, organize, and version control various visual designs, architecture diagrams, workflows, and other graphical documentation.
+This repository stores architecture and workflow diagrams as code using [Mermaid](https://mermaid.js.org/), with legacy `.drawio` files kept for reference during migration.
 
-## About
+## System Requirements
 
-All files in this repository are in the `.drawio` format, which can be opened and edited using the draw.io web app or desktop application. Saving your diagrams in a GitHub repository like this allows you to:
+You do **not** need to install anything to use this repository on GitHub:
 
-- Keep a versioned history of your diagrams
-- Collaborate or share diagrams easily
-- Access your diagrams from anywhere
-- Back up your work securely
+- Mermaid diagrams render directly in Markdown on GitHub.
+- The source diagrams are plain text `.mmd` files.
 
-## Usage
+Optional local tooling:
 
-1. **Viewing/Editing Diagrams:**
-	- Download any `.drawio` file and open it in [draw.io](https://app.diagrams.net/) or the desktop app.
-	- You can also use the [draw.io VS Code extension](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) to view and edit diagrams directly in VS Code.
+- **VS Code Mermaid preview**: install a Mermaid extension for live preview/editing.
+- **Export to PNG/SVG/PDF**: install Mermaid CLI via Node.js:
+  - `npm install -g @mermaid-js/mermaid-cli`
+  - Example: `mmdc -i diagrams/aws-codespaces.mmd -o diagrams/aws-codespaces.svg`
 
-2. **Adding New Diagrams:**
-	- Create a new diagram in draw.io and save it as a `.drawio` file.
-	- Commit and push the file to this repository.
+## Diagram Workflow
 
-3. **Version Control:**
-	- Use Git to track changes, revert to previous versions, and collaborate with others if desired.
+1. Edit or add diagram source files in `diagrams/*.mmd`.
+2. Embed Mermaid blocks in Markdown docs for rendered output on GitHub.
+3. Commit the `.mmd` source so diagram changes are cleanly diffable in pull requests.
 
 ## Files
 
-- `aws-codespaces.drawio` — AWS Codespaces related diagram
-- `brignano-io.drawio` — brignano.io related diagram
+### Mermaid (diagram-as-code)
 
-Feel free to explore, clone, or contribute new diagrams!
+- `diagrams/aws-codespaces.mmd` — AWS Codespaces architecture flow (starter conversion)
+- `diagrams/brignano-io.mmd` — brignano.io hosted zone/domain flow (starter conversion)
+
+### Legacy Draw.io
+
+- `aws-codespaces.drawio` — original Draw.io diagram
+- `brignano-io.drawio` — original Draw.io diagram
+
+## Notes
+
+- The Mermaid files are initial conversions intended to be refined over time.
+- Keep legacy `.drawio` files until you are fully satisfied with Mermaid parity.
