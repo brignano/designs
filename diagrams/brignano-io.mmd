@@ -1,0 +1,9 @@
+flowchart LR
+  subgraph A[anthonybrignano.com hosted zone]
+    WWWA[www.anthonybrignano.com\nRoute 53] -- A Alias --> RootA[anthonybrignano.com\nRoute 53]
+    RootA -- A Alias --> S3A[anthonybrignano.com\nS3 website bucket]
+  end
+
+  S3A -- Redirect all requests to --> RootB[brignano.io\nRoute 53]
+  WWWB[www.brignano.io\nRoute 53] -- A Alias --> RootB
+  RootB -- A Alias --> Vercel[brignano.io\nVercel]
