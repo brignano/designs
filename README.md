@@ -26,7 +26,21 @@ All files in this repository are in the `.drawio` format, which can be opened an
 
 ## Files
 
-- `aws-codespaces.drawio` — AWS Codespaces related diagram
-- `brignano-io.drawio` — brignano.io related diagram
+- `aws-config.drawio` — DNS + email-forwarding architecture and Terraform/AWS mapping
+- `brignano-io.drawio` — Amplify app/branch workspace architecture
+
+## Plain-English Workspace Summaries
+
+### aws-config workspace
+
+- **What it deploys:** DNS zones/records (Route53), inbound email handling (SES receipt rules), email archive storage (S3), forwarding logic (Lambda), permissions (IAM), and logs (CloudWatch).
+- **How it works together:** DNS sends website traffic to Vercel and email traffic to SES. SES stores incoming email in S3 and triggers Lambda. Lambda reads content, forwards it to Gmail, and writes logs to CloudWatch.
+- **Why this workspace exists:** It centralizes domain routing and mail-processing infrastructure.
+
+### brignano-io workspace
+
+- **What it deploys:** Only two resources: `aws_amplify_app.brignano_io` and `aws_amplify_branch.main`.
+- **How it works together:** The Amplify app is the container for the frontend deployment, and the `main` branch resource tells Amplify which branch/environment to build and serve.
+- **Why only two resources:** This workspace is intentionally scoped to application hosting setup. DNS/email/security supporting services are managed in `aws-config`, not duplicated here.
 
 Feel free to explore, clone, or contribute new diagrams!
