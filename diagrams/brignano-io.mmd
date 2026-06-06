@@ -1,12 +1,36 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#1a1a2e",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#444466",
+    "lineColor": "#aaaacc",
+    "secondaryColor": "#16213e",
+    "tertiaryColor": "#0f3460",
+    "background": "#1a1a2e",
+    "mainBkg": "#1a1a2e",
+    "nodeBorder": "#444466",
+    "clusterBkg": "#16213e",
+    "clusterBorder": "#444466",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#1a1a2e",
+    "fontFamily": "ui-monospace, monospace"
+  }
+}}%%
 flowchart LR
-  subgraph Hosting[AWS Amplify — brignano-io workspace]
-    App["aws_amplify_app.brignano_io\nbrignano.io app"]
+  classDef amplify  fill:#FF9900,stroke:#CC7A00,color:#000
+  classDef external fill:#2d2d2d,stroke:#666,color:#ccc,stroke-dasharray:4
+
+  subgraph Hosting["📦 AWS Amplify — brignano-io workspace"]
+    App["aws_amplify_app.brignano_io\nbrignano.io"]
     Branch["aws_amplify_branch.main\nmain branch"]
     App --> Branch
   end
 
-  GitHub["GitHub\nbrignano/brignano.io\n(source)"]
-  Browser["Browser\n(user)"]
+  GitHub["GitHub\nbrignano/brignano.io"]:::external
+  Browser["Browser"]:::external
 
-  GitHub -->|"push to main triggers build"| Branch
-  Browser -->|"https://brignano.io"| App
+  GitHub -->|push triggers build| Branch
+  Browser -->|https://brignano.io| App
+
+  class App,Branch amplify

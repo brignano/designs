@@ -1,45 +1,76 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#1a1a2e",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#444466",
+    "lineColor": "#aaaacc",
+    "secondaryColor": "#16213e",
+    "tertiaryColor": "#0f3460",
+    "background": "#1a1a2e",
+    "mainBkg": "#1a1a2e",
+    "nodeBorder": "#444466",
+    "clusterBkg": "#16213e",
+    "clusterBorder": "#444466",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#1a1a2e",
+    "fontFamily": "ui-monospace, monospace"
+  }
+}}%%
 flowchart LR
-  subgraph DNS[Route 53 — brignano.io hosted zone]
+  classDef route53    fill:#8C4FFF,stroke:#6B2FCC,color:#fff
+  classDef ses        fill:#E7157B,stroke:#B00D5E,color:#fff
+  classDef s3         fill:#3F8624,stroke:#2D6119,color:#fff
+  classDef lambda     fill:#FF9900,stroke:#CC7A00,color:#000
+  classDef iam        fill:#DD344C,stroke:#AA2438,color:#fff
+  classDef cloudwatch fill:#E7157B,stroke:#B00D5E,color:#fff
+  classDef external   fill:#2d2d2d,stroke:#666,color:#ccc,stroke-dasharray:4
+
+  subgraph DNS["🌐 Route 53 — brignano.io"]
     Zone["aws_route53_zone.default\nbrignano.io\nZ03854061GJ89FG9XI2HY"]
-    WebRecord["aws_route53_record.root\nbrignano.io A → Vercel"]
-    MailRecord["aws_route53_record.mx\nMX → inbound-smtp.us-east-1.amazonaws.com"]
+    WebRecord["aws_route53_record.root\nbrignano.io → Vercel"]
+    MailRecord["aws_route53_record.mx\nMX → SES inbound"]
     Zone --> WebRecord
     Zone --> MailRecord
   end
 
-  subgraph Email[SES — inbound email pipeline]
-    SES["aws_ses_receipt_rule_set.default\ndefault-rule-set"]
+  subgraph Email["📧 SES — Receipt Rules"]
+    RuleSet["aws_ses_receipt_rule_set.default\ndefault-rule-set"]
     RuleForward["aws_ses_receipt_rule.forward"]
     RuleNoreply["aws_ses_receipt_rule.noreply"]
     RuleArchive["aws_ses_receipt_rule.archive"]
-    SES --> RuleForward
-    SES --> RuleNoreply
-    SES --> RuleArchive
+    RuleSet --> RuleForward & RuleNoreply & RuleArchive
   end
 
-  subgraph Storage[S3]
+  subgraph Storage["🪣 S3"]
     Bucket["aws_s3_bucket.emails\nbrignano.io-emails"]
   end
 
-  subgraph Compute[Lambda]
+  subgraph Compute["⚡ Lambda"]
     Fn["aws_lambda_function.email_forwarder\nemail-forwarder"]
-    Logs["/aws/lambda/email-forwarder\nCloudWatch Logs"]
+    Logs["aws_cloudwatch_log_group\n/aws/lambda/email-forwarder"]
     Fn --> Logs
   end
 
-  subgraph Perms[IAM]
-    Role["aws_iam_role.lambda\nLambda execution role"]
-    Policy["aws_iam_role_policy.lambda\nS3 read + SES send"]
+  subgraph Perms["🔐 IAM"]
+    Role["aws_iam_role.lambda"]
+    Policy["aws_iam_role_policy.lambda\nS3 read · SES send"]
     Role --> Policy
   end
 
-  Vercel["Vercel\n(external)"]
-  Gmail["Gmail\n(external)"]
+  Vercel["Vercel"]:::external
+  Gmail["Gmail"]:::external
 
-  MailRecord -->|"inbound mail"| SES
-  WebRecord -->|"web traffic"| Vercel
-  RuleArchive -->|"store raw email"| Bucket
-  RuleForward -->|"trigger"| Fn
-  Bucket -->|"read email body"| Fn
-  Fn -->|"forward"| Gmail
-  Role -.->|"assumed by"| Fn
+  MailRecord -->|inbound mail| RuleSet
+  WebRecord -->|web traffic| Vercel
+  RuleArchive -->|store raw email| Bucket
+  RuleForward -->|trigger| Fn
+  Bucket -->|read body| Fn
+  Fn -->|forward| Gmail
+  Role -.->|assumed by| Fn
+
+  class Zone,WebRecord,MailRecord route53
+  class RuleSet,RuleForward,RuleNoreply,RuleArchive,Logs ses
+  class Bucket s3
+  class Fn lambda
+  class Role,Policy iam
