@@ -1,46 +1,30 @@
 # designs
 
-This repository is a personal collection of diagrams created with [draw.io](https://www.drawio.com/). It serves as a central place to store, organize, and version control various visual designs, architecture diagrams, workflows, and other graphical documentation.
+Architecture and workflow diagrams as code using [Mermaid](https://mermaid.js.org/). Legacy `.drawio` files are kept for reference.
 
-## About
+## Diagrams
 
-All files in this repository are in the `.drawio` format, which can be opened and edited using the draw.io web app or desktop application. Saving your diagrams in a GitHub repository like this allows you to:
+| File | What it covers |
+|------|----------------|
+| [`diagrams/aws-config.mmd`](diagrams/aws-config.mmd) | DNS routing + inbound email pipeline (Route53, SES, S3, Lambda, IAM) |
+| [`diagrams/brignano-io.mmd`](diagrams/brignano-io.mmd) | Frontend hosting (Amplify app + branch) |
 
-- Keep a versioned history of your diagrams
-- Collaborate or share diagrams easily
-- Access your diagrams from anywhere
-- Back up your work securely
+## Workflow
 
-## Usage
+1. Edit or add diagram source files in `diagrams/*.mmd`.
+2. Mermaid renders directly in GitHub Markdown — no tooling required to view.
+3. Commit `.mmd` source so diagram changes are diffable in pull requests.
 
-1. **Viewing/Editing Diagrams:**
-	- Download any `.drawio` file and open it in [draw.io](https://app.diagrams.net/) or the desktop app.
-	- You can also use the [draw.io VS Code extension](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) to view and edit diagrams directly in VS Code.
+### Optional local tooling
 
-2. **Adding New Diagrams:**
-	- Create a new diagram in draw.io and save it as a `.drawio` file.
-	- Commit and push the file to this repository.
+- **VS Code**: install a Mermaid extension for live preview.
+- **Export PNG/SVG**: `npm install -g @mermaid-js/mermaid-cli` then `mmdc -i diagrams/aws-config.mmd -o diagrams/aws-config.svg`
 
-3. **Version Control:**
-	- Use Git to track changes, revert to previous versions, and collaborate with others if desired.
+## Context
 
-## Files
+Per-diagram environment and Terraform workspace context lives in [`.github/context/`](.github/context/).
 
-- `aws-config.drawio` — DNS + email-forwarding architecture and Terraform/AWS mapping
-- `brignano-io.drawio` — Amplify app/branch workspace architecture
+## Legacy Draw.io files
 
-## Plain-English Workspace Summaries
-
-### aws-config workspace
-
-- **What it deploys:** DNS zones/records (Route53), inbound email handling (SES receipt rules), email archive storage (S3), forwarding logic (Lambda), permissions (IAM), and logs (CloudWatch).
-- **How it works together:** DNS sends website traffic to Vercel and email traffic to SES. SES stores incoming email in S3 and triggers Lambda. Lambda reads content, forwards it to Gmail, and writes logs to CloudWatch.
-- **Why this workspace exists:** It centralizes domain routing and mail-processing infrastructure.
-
-### brignano-io workspace
-
-- **What it deploys:** Only two resources: `aws_amplify_app.brignano_io` and `aws_amplify_branch.main`.
-- **How it works together:** The Amplify app is the container for the frontend deployment, and the `main` branch resource tells Amplify which branch/environment to build and serve.
-- **Why only two resources:** This workspace is intentionally scoped to application hosting setup. DNS/email/security supporting services are managed in `aws-config`, not duplicated here.
-
-Feel free to explore, clone, or contribute new diagrams!
+- `aws-config.drawio` — original draw.io diagram for aws-config workspace
+- `brignano-io.drawio` — original draw.io diagram for brignano-io workspace

@@ -1,0 +1,12 @@
+flowchart LR
+  subgraph Hosting[AWS Amplify — brignano-io workspace]
+    App["aws_amplify_app.brignano_io\nbrignano.io app"]
+    Branch["aws_amplify_branch.main\nmain branch"]
+    App --> Branch
+  end
+
+  GitHub["GitHub\nbrignano/brignano.io\n(source)"]
+  Browser["Browser\n(user)"]
+
+  GitHub -->|"push to main triggers build"| Branch
+  Browser -->|"https://brignano.io"| App

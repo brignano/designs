@@ -1,0 +1,45 @@
+flowchart LR
+  subgraph DNS[Route 53 — brignano.io hosted zone]
+    Zone["aws_route53_zone.default\nbrignano.io\nZ03854061GJ89FG9XI2HY"]
+    WebRecord["aws_route53_record.root\nbrignano.io A → Vercel"]
+    MailRecord["aws_route53_record.mx\nMX → inbound-smtp.us-east-1.amazonaws.com"]
+    Zone --> WebRecord
+    Zone --> MailRecord
+  end
+
+  subgraph Email[SES — inbound email pipeline]
+    SES["aws_ses_receipt_rule_set.default\ndefault-rule-set"]
+    RuleForward["aws_ses_receipt_rule.forward"]
+    RuleNoreply["aws_ses_receipt_rule.noreply"]
+    RuleArchive["aws_ses_receipt_rule.archive"]
+    SES --> RuleForward
+    SES --> RuleNoreply
+    SES --> RuleArchive
+  end
+
+  subgraph Storage[S3]
+    Bucket["aws_s3_bucket.emails\nbrignano.io-emails"]
+  end
+
+  subgraph Compute[Lambda]
+    Fn["aws_lambda_function.email_forwarder\nemail-forwarder"]
+    Logs["/aws/lambda/email-forwarder\nCloudWatch Logs"]
+    Fn --> Logs
+  end
+
+  subgraph Perms[IAM]
+    Role["aws_iam_role.lambda\nLambda execution role"]
+    Policy["aws_iam_role_policy.lambda\nS3 read + SES send"]
+    Role --> Policy
+  end
+
+  Vercel["Vercel\n(external)"]
+  Gmail["Gmail\n(external)"]
+
+  MailRecord -->|"inbound mail"| SES
+  WebRecord -->|"web traffic"| Vercel
+  RuleArchive -->|"store raw email"| Bucket
+  RuleForward -->|"trigger"| Fn
+  Bucket -->|"read email body"| Fn
+  Fn -->|"forward"| Gmail
+  Role -.->|"assumed by"| Fn
